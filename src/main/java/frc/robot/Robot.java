@@ -18,10 +18,23 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
  * directory.
  */
 public class Robot extends TimedRobot {
-  private TalonSRX left1 = new TalonSRX(1);
-  private TalonSRX left2 = new TalonSRX(1);
-  private TalonSRX left1 = new TalonSRX(1);
-  private TalonSRX left1 = new TalonSRX(1);
+
+  /*
+   *  0: collor wheel
+      1: winch
+      2: intake
+      3: winch
+      4: shooter
+      5: right1
+      6: right2
+      7: left1
+      8: left2
+      9: indexer
+   */
+  private TalonSRX left1 = new TalonSRX(7);
+  private TalonSRX left2 = new TalonSRX(8);
+  private TalonSRX right1 = new TalonSRX(5);
+  private TalonSRX right2 = new TalonSRX(6);
 
   
   //private final PWMSparkMax m_leftDrive = new PWMSparkMax(0);
@@ -70,10 +83,14 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //m_robotDrive.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
-    talon.set(ControlMode.PercentOutput, m_controller.getLeftY());
+    left1.set(ControlMode.PercentOutput, m_controller.getLeftY());
+    //left2.set(ControlMode.PercentOutput, m_controller.getLeftY());
+
+    //right1.set(ControlMode.PercentOutput, m_controller.getRightY());
+    //right2.set(ControlMode.PercentOutput, m_controller.getRightY());
 
     //print the controller output to the roborio console
-    System.out.println(m_controller.getLeftY());
+    //System.out.println(m_controller.getLeftY());
   }
 
   /** This function is called once each time the robot enters test mode. */
