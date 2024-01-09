@@ -4,9 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -31,11 +38,18 @@ public class Robot extends TimedRobot {
       8: left2
       9: indexer
    */
-  private TalonSRX left1 = new TalonSRX(7);
-  private TalonSRX left2 = new TalonSRX(8);
-  private TalonSRX right1 = new TalonSRX(5);
-  private TalonSRX right2 = new TalonSRX(6);
+  private TalonSRX shooter1 = new TalonSRX(6);
+  private TalonSRX shooter2 = new TalonSRX(5);
+  private TalonSRX intake1 = new TalonSRX(2);
+  private TalonSRX intake2 = new TalonSRX(1);
+  private TalonSRX intakeTop = new TalonSRX(9);
 
+  private TalonSRX left1 = new TalonSRX(8);
+  private TalonSRX left2 = new TalonSRX(7);
+  private TalonSRX right1 = new TalonSRX(0);
+  private TalonSRX right2 = new TalonSRX(3);
+
+  private int outtaking = 1, invertShooter = 1;
   
   //private final PWMSparkMax m_leftDrive = new PWMSparkMax(0);
   //private final PWMSparkMax m_rightDrive = new PWMSparkMax(1);
@@ -77,13 +91,49 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters teleoperated mode. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+  }
 
   /** This function is called periodically during teleoperated mode. */
   @Override
   public void teleopPeriodic() {
     //m_robotDrive.arcadeDrive(-m_controller.getLeftY(), -m_controller.getRightX());
-    left1.set(ControlMode.PercentOutput, m_controller.getLeftY());
+    double intakePower = m_controller.getLeftTriggerAxis() * .7 * outtaking;
+    intake1.set(ControlMode.PercentOutput, intakePower);
+    intake2.set(ControlMode.PercentOutput, -intakePower);
+
+    intakeTop.set(ControlMode.PercentOutput, intakePower);
+
+    double shooterPower = m_controller.getRightTriggerAxis() * .7 * invertShooter;
+
+    shooter1.set(ControlMode.PercentOutput, shooterPower);
+    shooter2.set(ControlMode.PercentOutput, shooterPower);
+    
+    
+    if (m_controller.getLeftBumperPressed())
+      outtaking = -1;
+
+    if (m_controller.getLeftBumperReleased())
+      outtaking = 1;
+
+    if (m_controller.getRightBumperPressed())
+      invertShooter = -1;
+    
+    if (m_controller.getRightBumperReleased())
+      invertShooter = 1;
+
+
+    double leftIn = m_controller.getLeftY(), rightIn = m_controller.getRightY();
+
+    leftIn = (Math.abs(leftIn) < 0.1 ? 0 : -leftIn);
+    rightIn = (Math.abs(rightIn) < 0.1 ? 0 : rightIn);
+
+    left1.set(ControlMode.PercentOutput, leftIn);
+    left2.set(ControlMode.PercentOutput, leftIn);
+    right1.set(ControlMode.PercentOutput, rightIn);
+    right2.set(ControlMode.PercentOutput, rightIn);
+
+
     //left2.set(ControlMode.PercentOutput, m_controller.getLeftY());
 
     //right1.set(ControlMode.PercentOutput, m_controller.getRightY());
